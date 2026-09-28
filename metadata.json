@@ -1,0 +1,6 @@
+{
+  "name": "Los Chamos FC - Plantilla Fútbol 5 Pro",
+  "description": "Simulador interactivo, cartas estilo Ultimate Team y cancha táctica profesional 3D para el equipo Los Chamos FC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Los Chamos FC - Match Simulator Pro Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --chamos-red: #dc2626;
+            --chamos-dark-red: #991b1b;
+            --gold-glow: #f59e0b;
+            --gold-highlight: #fef08a;
+            --card-dark: linear-gradient(145deg, #09090b, #18181b);
+            --pitch-green-1: #15803d;
+            --pitch-green-2: #166534;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100dvh;
+            max-height: 100dvh;
+            overflow: hidden;
+            background: #000000;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        /* FORMATO NATIVO CELULAR */
+        .mobile-shell {
+            width: 100vw;
+            max-width: 440px;
+            height: 100dvh;
+            max-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            background: radial-gradient(circle at 50% 15%, #18181b 0%, #000000 85%);
+            border-left: 1px solid rgba(220, 38, 38, 0.2);
+            border-right: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        /* 1. HEADER BROADCAST TV */
+        .tv-header {
+            width: 96%;
+            margin-top: 4px;
+            background: rgba(9, 9, 11, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--chamos-red);
+            border-radius: 12px;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+            z-index: 40;
+        }
+
+        .tv-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crest-svg {
+            width: 32px;
+            height: 38px;
+            filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.6));
+        }
+
+        .tv-team-name {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            line-height: 0.9;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .tv-badge {
+            font-size: 0.55rem;
+            color: var(--gold-glow);
+            font-family: monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: block;
+        }
+
+        /* Marcador TV */
+        .tv-scoreboard {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #000000;
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .score-box {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0 4px;
+            color: #fff;
+            background: rgba(220, 38, 38, 0.25);
+            border-radius: 4px;
+        }
+
+        .score-team {
+            font-family: 'Teko', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gold-glow);
+        }
+
+        .score-clock {
+            font-size: 0.65rem;
+            font-family: monospace;
+            color: #34d399;
+            font-weight: bold;
+            border-left: 1px solid rgba(255,255,255,0.15);
+            padding-left: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 2. BARRA DE CONTROLES TÁCTICOS */
+        .tactics-bar {
+            width: 96%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            margin: 3px 0;
+            z-index: 30;
+        }
+
+        .btn-broadcast {
+            flex: 1;
+            background: linear-gradient(135deg, var(--chamos-red) 0%, #991b1b 100%);
+            color: #fff;
+            border: 1px solid var(--gold-glow);
+            padding: 6px 10px;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.8px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-broadcast:disabled {
+            opacity: 0.55;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+
+        .play-select {
+            background: #09090b;
+            color: var(--gold-glow);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            font-family: 'Teko', sans-serif;
+            font-size: 0.95rem;
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 6px;
+            outline: none;
+            max-width: 140px;
+        }
+
+        /* 3. CANCHA 3D */
+        .court-viewport {
+            width: 96%;
+            height: 52vh;
+            position: relative;
+            perspective: 1050px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .court-3d {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 30%, rgba(220, 38, 38, 0.15) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, var(--pitch-green-1), var(--pitch-green-1) 28px, var(--pitch-green-2) 28px, var(--pitch-green-2) 56px);
+            transform: rotateX(36deg);
+            transform-style: preserve-3d;
+            border-radius: 14px;
+            border: 3.5px solid var(--gold-glow);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 25px rgba(220,38,38,0.3), inset 0 0 60px rgba(0,0,0,0.7);
+            position: relative;
+            transition: transform 0.6s ease;
+        }
+
+        .court-lines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .line-center {
+            position: absolute;
+            top: 50%; width: 100%; height: 2px;
+            background: rgba(255,255,255,0.85);
+        }
+
+        .circle-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85px; height: 85px;
+            border: 2px solid rgba(255,255,255,0.85);
+            border-radius: 50%;
+        }
+
+        .area-top {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 150px; height: 55px;
+            border: 2px solid rgba(255,255,255,0.85);
+            border-top: none;
+            border-bottom-left-radius: 75px; border-bottom-right-radius: 75px;
+        }
+
+        .area-bottom {
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 150px; height: 55px;
+            border: 2px solid rgba(255,255,255,0.85);
+            border-bottom: none;
+            border-top-left-radius: 75px; border-top-right-radius: 75px;
+        }
+
+        /* Balón */
+        .ball {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #94a3b8);
+            border-radius: 50%;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.8), 0 0 8px rgba(245,158,11,0.8);
+            z-index: 25;
+            transform: translate(-50%, -50%) rotateX(-36deg);
+            transition: left 0.55s cubic-bezier(0.25, 1, 0.5, 1), top 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Slots de Jugadores */
+        .player-slot {
+            position: absolute;
+            transform: translate(-50%, -50%) rotateX(-36deg);
+            transform-style: preserve-3d;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .player-card {
+            width: 66px;
+            height: 94px;
+            background: linear-gradient(180deg, #18181b 0%, #09090b 100%);
+            border: 2px solid var(--gold-glow);
+            border-radius: 9px;
+            padding: 2px 3px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 12px rgba(245, 158, 11, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-rat {
+            position: absolute; top: 2px; left: 4px;
+            font-family: 'Teko', sans-serif;
+            font-size: 0.95rem; line-height: 0.85; font-weight: 700;
+        }
+
+        .card-pos { font-size: 0.48rem; color: var(--gold-glow); font-weight: 900; }
+
+        /* Muñeco SVG en Carta */
+        .card-doll {
+            width: 48px;
+            height: 52px;
+            margin-top: 8px;
+        }
+
+        .card-name {
+            font-family: 'Teko', sans-serif;
+            font-size: 0.85rem; font-weight: 700;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(220, 38, 38, 0.4);
+            width: 100%; text-align: center;
+            padding-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--gold-glow);
+            background: #000;
+            border-radius: 3px;
+        }
+
+        /* 4. BANNER CELEBRACIÓN DE GOL Y CONFETI */
+        .goal-banner {
+            position: fixed;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(9, 9, 11, 0.96);
+            border: 3px solid var(--gold-glow);
+            padding: 16px 20px;
+            border-radius: 18px;
+            text-align: center;
+            z-index: 300;
+            box-shadow: 0 0 60px rgba(245, 158, 11, 0.8), 0 0 30px rgba(220, 38, 38, 0.7);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            width: 88vw;
+            max-width: 360px;
+        }
+
+        .goal-banner.active { transform: translate(-50%, -50%) scale(1); }
+
+        .goal-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 4rem;
+            color: var(--chamos-red);
+            line-height: 0.8;
+            text-shadow: 0 0 25px rgba(220,38,38,0.9);
+        }
+
+        .scorer-name {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin: 4px 0;
+        }
+
+        .team-motto {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.2rem;
+            color: var(--gold-glow);
+            border-top: 1px dashed rgba(255,255,255,0.25);
+            padding-top: 6px;
+        }
+
+        /* Partículas Confeti CSS */
+        .confetti-container {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 290;
+            display: none;
+        }
+        .confetti-container.active { display: block; }
+
+        .confetti-piece {
+            position: absolute;
+            width: 8px; height: 14px;
+            top: -20px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* 5. TABLILLA DE SUSTITUCIÓN ÁRBITRO */
+        .sub-board {
+            position: fixed;
+            top: 55px; left: 50%;
+            transform: translateX(-50%) translateY(-120%);
+            background: #000000;
+            border: 2px solid var(--chamos-red);
+            border-radius: 12px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9), 0 0 15px rgba(220, 38, 38, 0.6);
+            z-index: 250;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .sub-board.active { transform: translateX(-50%) translateY(0); }
+
+        .sub-box {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Teko', sans-serif;
+        }
+
+        .sub-num {
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        .sub-out .sub-num { background: rgba(220, 38, 38, 0.3); color: #ef4444; border: 1px solid #ef4444; }
+        .sub-in .sub-num { background: rgba(34, 197, 94, 0.3); color: #22c55e; border: 1px solid #22c55e; }
+
+        .sub-text {
+            font-size: 0.85rem;
+            color: #fff;
+            line-height: 1;
+        }
+
+        /* 6. BANCA DE SUPLENTES CON ANIMACIÓN SLIDE-IN REBOTE */
+        .bench-container {
+            width: 96%;
+            background: rgba(9, 9, 11, 0.95);
+            border: 1.5px solid var(--chamos-red);
+            border-radius: 12px;
+            padding: 5px 8px;
+            margin-bottom: 6px;
+            z-index: 40;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.25);
+        }
+
+        .bench-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 0.95rem;
+            color: var(--gold-glow);
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        .bench-list {
+            display: flex;
+            justify-content: space-around;
+            gap: 6px;
+        }
+
+        /* Slide-in con efecto de rebote en los suplentes */
+        @keyframes slideInBounce {
+            0% {
+                opacity: 0;
+                transform: translateY(35px) scale(0.75);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-8px) scale(1.08);
+            }
+            80% {
+                transform: translateY(3px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .bench-card {
+            background: #000000;
+            border: 1.5px solid var(--gold-glow);
+            border-radius: 8px;
+            padding: 3px 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: grab;
+            font-size: 0.8rem;
+            animation: slideInBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        /* Modal Stats */
+        .stats-modal {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 400; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .stats-modal.active { opacity: 1; pointer-events: auto; }
+
+        .stats-card {
+            width: 85vw; max-width: 300px;
+            background: #09090b;
+            border: 2.5px solid var(--gold-glow);
+            border-radius: 16px; padding: 16px; text-align: center;
+            position: relative;
+        }
+
+        .close-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; font-size: 1.6rem; color: #94a3b8; cursor: pointer; }
+        .modal-player-name { font-family: 'Teko', sans-serif; font-size: 2rem; color: var(--gold-glow); line-height: 1; }
+        .modal-player-role { font-size: 0.75rem; color: #ef4444; font-weight: 700; margin-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+        .stat-box { background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220,38,38,0.3); padding: 4px 6px; border-radius: 6px; display: flex; justify-content: space-between; font-weight: 700; font-size: 0.8rem; }
+        .stat-value { color: var(--gold-glow); }
+        .modal-desc { font-size: 0.75rem; color: #cbd5e1; background: rgba(0,0,0,0.6); padding: 6px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor optimizado formato celular -->
+    <div class="mobile-shell">
+
+        <!-- 1. Header Broadcast TV con Escudo Oficial y Marcador Dinámico -->
+        <header class="tv-header">
+            <div class="tv-brand">
+                <!-- Escudo Oficial Vectorial Los Chamos FC -->
+                <svg class="crest-svg" viewBox="0 0 100 125" fill="none">
+                    <path d="M 10 16 C 30 12 70 12 90 16 C 92 62 78 98 50 120 C 22 98 8 62 10 16 Z" fill="#f59e0b" stroke="#78350f" stroke-width="1.5"/>
+                    <path d="M 12 18 C 30 14 70 14 88 18 C 90 60 76 95 50 115 C 24 95 10 60 12 18 Z" fill="#09090b"/>
+                    <!-- Franjas Rojas y Negras -->
+                    <rect x="14" y="18" width="14" height="95" fill="#dc2626"/>
+                    <rect x="28" y="18" width="14" height="95" fill="#09090b"/>
+                    <rect x="42" y="18" width="16" height="95" fill="#dc2626"/>
+                    <rect x="58" y="18" width="14" height="95" fill="#09090b"/>
+                    <rect x="72" y="18" width="14" height="95" fill="#dc2626"/>
+                    <!-- Cinta Superior -->
+                    <path d="M 14 19 C 30 16 70 16 86 19 L 86 33 C 70 30 30 30 14 33 Z" fill="#09090b" stroke="#f59e0b" stroke-width="1"/>
+                    <text x="50" y="27" text-anchor="middle" fill="#f59e0b" font-size="7.5" font-weight="bold" font-family="sans-serif">LOS CHAMOS FC</text>
+                    <!-- Monograma CH Dorado -->
+                    <text x="50" y="66" text-anchor="middle" fill="#f59e0b" stroke="#78350f" stroke-width="1" font-size="34" font-weight="900" font-family="sans-serif">CH</text>
+                    <!-- Estrella Dorada -->
+                    <polygon points="50,82 52,86.5 57,87 53.5,90 54.5,95 50,92.5 45.5,95 46.5,90 43,87 48,86.5" fill="#f59e0b"/>
+                    <text x="50" y="106" text-anchor="middle" fill="#f59e0b" font-size="7" font-weight="bold" font-family="sans-serif">- 2026 -</text>
+                </svg>
+
+                <div>
+                    <h1 class="tv-team-name">LOS CHAMOS FC</h1>
+                    <span class="tv-badge">92 OVR · 2026 PRO</span>
+                </div>
+            </div>
+
+            <div class="tv-scoreboard">
+                <span class="score-team">CHAMOS</span>
+                <span class="score-box" id="score-chamos">3</span>
+                <span style="color:#ef4444;">-</span>
+                <span class="score-box" id="score-rival">1</span>
+                <span class="score-team" style="color:#94a3b8;">RIV</span>
+
+                <div class="score-clock">
+                    <span style="color:#ef4444;">1T ●</span>
+                    <span id="match-clock">18:24</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 2. Barra de Selección Táctica y Transmisión -->
+        <section class="tactics-bar" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; align-items:center;">
+            <button class="btn-broadcast" id="start-match-btn" onclick="startLineupPresentation()" style="background:linear-gradient(90deg, #f59e0b, #fbbf24); color:#000; font-weight:800; font-size:1.1rem; padding:6px 14px; box-shadow:0 0 15px rgba(245,158,11,0.6);">▶ INICIAR PARTIDO</button>
+            <button class="btn-broadcast" id="play-btn" onclick="startRandomGoalPlay()" style="display:none; background:linear-gradient(90deg, #dc2626, #ef4444, #f59e0b); color:#fff; font-weight:800; font-size:1.15rem; padding:6px 16px; box-shadow:0 0 18px rgba(220,38,38,0.7); animation:pulse 1.5s infinite;">▶ PLAY · GOL (25%)</button>
+            <button class="btn-broadcast" id="reset-btn" onclick="resetMatch()" style="background:#18181b; border:1px solid #f59e0b; color:#fef08a; font-size:0.95rem;">🔄 REINICIAR</button>
+        </section>
+
+        <!-- 3. Cancha 3D Futsal Pro -->
+        <main class="court-viewport">
+            <div class="court-3d" id="court">
+                <div class="court-lines">
+                    <div class="line-center"></div>
+                    <div class="circle-center"></div>
+                    <div class="area-top"></div>
+                    <div class="area-bottom"></div>
+                </div>
+
+                <!-- Balón Dinámico -->
+                <div class="ball" id="ball"></div>
+
+                <!-- 5 Titulares con Muñecos Vectoriales (Todos 92 OVR) -->
+                <div class="player-slot" id="slot-0" onclick="openStats(0)" ondragover="allowDrop(event)" ondrop="dropPlayer(event, 0)"></div>
+                <div class="player-slot" id="slot-1" onclick="openStats(1)" ondragover="allowDrop(event)" ondrop="dropPlayer(event, 1)"></div>
+                <div class="player-slot" id="slot-2" onclick="openStats(2)" ondragover="allowDrop(event)" ondrop="dropPlayer(event, 2)"></div>
+                <div class="player-slot" id="slot-3" onclick="openStats(3)" ondragover="allowDrop(event)" ondrop="dropPlayer(event, 3)"></div>
+                <div class="player-slot" id="slot-4" onclick="openStats(4)" ondragover="allowDrop(event)" ondrop="dropPlayer(event, 4)"></div>
+            </div>
+        </main>
+
+        <!-- 4. Tablilla Oficial de Sustitución -->
+        <div class="sub-board" id="sub-board">
+            <div class="sub-box sub-out">
+                <div class="sub-num" id="sub-out-num">5</div>
+                <div class="sub-text"><span>SALE</span><br><b id="sub-out-name">PERCU</b></div>
+            </div>
+            <span style="color:#f59e0b; font-size:1.1rem;">⇄</span>
+            <div class="sub-box sub-in">
+                <div class="sub-num" id="sub-in-num">10</div>
+                <div class="sub-text"><span>ENTRA</span><br><b id="sub-in-name">JOSUÉ</b></div>
+            </div>
+        </div>
+
+        <!-- 5. Banner de Gol y Confeti -->
+        <div class="confetti-container" id="confetti-container"></div>
+        <div class="goal-banner" id="goal-banner">
+            <div class="goal-title">¡¡¡GOOOOL!!!</div>
+            <div class="scorer-name" id="scorer-name">FRANCO</div>
+            <div class="team-motto" id="team-motto">"MÁS HECHOS QUE PALABRAS"</div>
+        </div>
+
+        <!-- 6. Banca de Suplentes con Animación de Rebote -->
+        <footer class="bench-container">
+            <div class="bench-title">SUPLENTES 92 OVR (ARRASTRA A LA CANCHA):</div>
+            <div class="bench-list" id="bench-list"></div>
+        </footer>
+
+        <!-- 7. Modal de Atributos FIFA -->
+        <div class="stats-modal" id="stats-modal">
+            <div class="stats-card">
+                <button class="close-btn" onclick="closeStats()">&times;</button>
+                <div class="modal-player-name" id="modal-name">PLAYER</div>
+                <div class="modal-player-role" id="modal-role">POSICIÓN</div>
+                <div class="stats-grid">
+                    <div class="stat-box"><span>RIT</span><span class="stat-value" id="st-rit">92</span></div>
+                    <div class="stat-box"><span>REG</span><span class="stat-value" id="st-dri">92</span></div>
+                    <div class="stat-box"><span>TIR</span><span class="stat-value" id="st-sho">92</span></div>
+                    <div class="stat-box"><span>DEF</span><span class="stat-value" id="st-def">92</span></div>
+                    <div class="stat-box"><span>PAS</span><span class="stat-value" id="st-pas">92</span></div>
+                    <div class="stat-box"><span>FÍS</span><span class="stat-value" id="st-phy">92</span></div>
+                </div>
+                <p class="modal-desc" id="modal-desc">Descripción táctica.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Coordenadas base en cancha (%)
+        const basePositions = [
+            { top: 22, left: 32 }, // 0: Franco (Pívot Izq)
+            { top: 22, left: 68 }, // 1: Henry (Pívot Der)
+            { top: 48, left: 50 }, // 2: Percu (Medio Campo)
+            { top: 72, left: 50 }, // 3: Aaron (Cierre)
+            { top: 89, left: 50 }  // 4: Raúl (Portero)
+        ];
+
+        // Titulares actuales (TODOS CON MEDIA 92 Y MUÑECO)
+        let starters = [
+            { name: "Franco", pos: "PIV", num: 9, role: "Pívot Izquierdo / Goleador", rat: 92, rit: 94, sho: 93, pas: 88, dri: 91, def: 50, phy: 88, desc: "Potencia pura y definición letal de primera intención." },
+            { name: "Henry", pos: "PIV", num: 7, role: "Pívot Derecho / Extremo", rat: 92, rit: 93, sho: 92, pas: 85, dri: 90, def: 55, phy: 86, desc: "Desborde supersónico y remates cruzados imparables." },
+            { name: "Percu", pos: "MED", num: 5, role: "Medio Campo / Especialista", rat: 92, rit: 88, sho: 87, pas: 91, dri: 89, def: 90, phy: 93, desc: "Presión alta, recuperación férrea y distribución limpia." },
+            { name: "Aaron", pos: "CIE", num: 4, role: "Cierre / Muro Defensivo", rat: 92, rit: 86, sho: 80, pas: 85, dri: 82, def: 94, phy: 92, desc: "Líder de la zaga y zapatazos potentes desde su campo." },
+            { name: "Raúl", pos: "POR", num: 1, role: "Portero Titular", rat: 92, rit: 89, sho: 42, pas: 85, dri: 76, def: 94, phy: 90, desc: "Reflejos felinos, achique seguro y salidas de contragolpe." }
+        ];
+
+        // Suplentes actuales (TODOS CON MEDIA 92 Y MUÑECO)
+        let bench = [
+            { name: "Jhondeiber", pos: "ALA", num: 11, role: "Ala / Revulsivo", rat: 92, rit: 95, sho: 89, pas: 86, dri: 93, def: 65, phy: 85, desc: "Velocidad explosiva y desequilibrio individual." },
+            { name: "Josué", pos: "MED", num: 10, role: "Medio / Cerebro Táctico", rat: 92, rit: 88, sho: 87, pas: 95, dri: 93, def: 72, phy: 82, desc: "Visión privilegiada para filtrar balones imposibles." },
+            { name: "Gerardo", pos: "POR", num: 12, role: "Portero / Capitán", rat: 92, rit: 87, sho: 40, pas: 88, dri: 72, def: 93, phy: 89, desc: "Voz de mando y saques precisos teledirigidos." }
+        ];
+
+        // Marcador y Estado
+        let chamosScore = 3;
+        let rivalScore = 1;
+        let matchSeconds = 18 * 60 + 24;
+        let isAnimating = false;
+
+        // Generador SVG de Muñeco Futbolista de Los Chamos FC
+        function generateDollSVG(player) {
+            const isGK = player.pos === 'POR';
+            const jerseyPattern = isGK 
+                ? '<rect width="100" height="100" fill="#eab308"/>' 
+                : '<rect x="0" y="0" width="10" height="100" fill="#dc2626"/><rect x="10" y="0" width="10" height="100" fill="#09090b"/><rect x="20" y="0" width="10" height="100" fill="#dc2626"/><rect x="30" y="0" width="10" height="100" fill="#09090b"/><rect x="40" y="0" width="10" height="100" fill="#dc2626"/><rect x="50" y="0" width="10" height="100" fill="#09090b"/>';
+
+            return `
+            <svg class="card-doll" viewBox="0 0 100 120">
+                <defs>
+                    <clipPath id="doll-clip-${player.num}">
+                        <path d="M 22 84 C 24 55 35 50 50 50 C 65 50 76 55 78 84 L 86 125 L 14 125 Z" />
+                    </clipPath>
+                </defs>
+                <!-- Torso con Franjas Rojas y Negras Oficiales -->
+                <g clip-path="url(#doll-clip-${player.num})">
+                    ${jerseyPattern}
+                </g>
+                <!-- Cuello Dorado -->
+                <path d="M 38 51 Q 50 63 62 51" fill="#f59e0b" stroke="#78350f" stroke-width="1"/>
+                <!-- Dorsal -->
+                <text x="50" y="94" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold" font-family="Teko, sans-serif">${player.num}</text>
+                <!-- Cabeza y Pelo -->
+                <ellipse cx="50" cy="33" rx="14" ry="17" fill="#f3cba0"/>
+                <path d="M 35 27 C 34 14 43 11 50 10 C 57 11 66 14 65 27 C 62 19 57 16 50 16 C 43 16 38 19 35 27 Z" fill="#171717"/>
+                <circle cx="45" cy="33" r="1.8" fill="#171717"/>
+                <circle cx="55" cy="33" r="1.8" fill="#171717"/>
+                <path d="M 46 41 Q 50 44 54 41" stroke="#854d0e" stroke-width="1.2" fill="none"/>
+            </svg>`;
+        }
+
+        // Sintetizador Nativo Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playWhistle() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2600, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+        }
+
+        function playKickFX() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        function playSubChime() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            [800, 1200].forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
+                gain.gain.setValueAtTime(0.18, audioCtx.currentTime + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.12 + 0.18);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.12);
+                osc.stop(audioCtx.currentTime + i * 0.12 + 0.18);
+            });
+        }
+
+        function playGoalFanfare() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const bufferSize = audioCtx.sampleRate * 1.8;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass'; filter.frequency.setValueAtTime(750, audioCtx.currentTime); filter.Q.value = 1.2;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.8);
+            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            noise.start(); noise.stop(audioCtx.currentTime + 1.8);
+        }
+
+        // Renderizado con Muñecos
+        function renderStarters() {
+            for (let i = 0; i < 5; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                const p = starters[i];
+                slot.style.top = `${basePositions[i].top}%`;
+                slot.style.left = `${basePositions[i].left}%`;
+                slot.innerHTML = `
+                    <div class="player-card">
+                        <div class="card-rat">${p.rat}<br><span class="card-pos">${p.pos}</span></div>
+                        ${generateDollSVG(p)}
+                        <div class="card-name">${p.name}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Renderizado de Suplentes con Animación de Rebote
+        function renderBench() {
+            const list = document.getElementById('bench-list');
+            list.innerHTML = '';
+            bench.forEach((p, index) => {
+                const item = document.createElement('div');
+                item.className = 'bench-card';
+                item.style.animationDelay = `${index * 110}ms`;
+                item.draggable = true;
+                item.ondragstart = (e) => dragStart(e, index);
+                item.onclick = () => openBenchStats(index);
+                item.innerHTML = `
+                    <div style="width:24px; height:28px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                        ${generateDollSVG(p)}
+                    </div>
+                    <div style="display:flex; flex-direction:column; line-height:1;">
+                        <span style="font-family:'Teko'; font-size:1.1rem; color:#f59e0b; font-weight:bold;">#${p.num} ${p.name}</span>
+                        <span style="font-size:0.65rem; color:#ef4444; font-weight:bold;">${p.pos} · 92</span>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // Sistema Drag & Drop con Feedback de Tablilla Árbitro
+        let draggedBenchIndex = null;
+        function dragStart(event, index) { draggedBenchIndex = index; event.dataTransfer.setData("text/plain", index); }
+        function allowDrop(event) { event.preventDefault(); }
+
+        function dropPlayer(event, starterIndex) {
+            event.preventDefault();
+            if (draggedBenchIndex === null || isAnimating) return;
+
+            const outgoing = starters[starterIndex];
+            const incoming = bench[draggedBenchIndex];
+
+            starters[starterIndex] = incoming;
+            bench[draggedBenchIndex] = outgoing;
+
+            renderStarters();
+            renderBench();
+            draggedBenchIndex = null;
+
+            triggerSubBoard(outgoing, incoming);
+        }
+
+        function triggerSubBoard(outgoing, incoming) {
+            const board = document.getElementById('sub-board');
+            document.getElementById('sub-out-num').innerText = outgoing.num;
+            document.getElementById('sub-out-name').innerText = outgoing.name.toUpperCase();
+            document.getElementById('sub-in-num').innerText = incoming.num;
+            document.getElementById('sub-in-name').innerText = incoming.name.toUpperCase();
+
+            board.classList.add('active');
+            playSubChime();
+
+            setTimeout(() => { board.classList.remove('active'); }, 3500);
+        }
+
+        // 1. Reiniciar Partido a 0 - 0 y Tiempo 00:00
+        let isClockRunning = false;
+        let clockInterval = null;
+
+        function startFastClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            isClockRunning = true;
+            clockInterval = setInterval(() => {
+                if (!isClockRunning) return;
+                matchSeconds += 4;
+                if (matchSeconds >= 2400) {
+                    matchSeconds = 2400;
+                    isClockRunning = false;
+                    clearInterval(clockInterval);
+                    playWhistle();
+                    const playBtn = document.getElementById('play-btn');
+                    playBtn.innerText = "FIN (40') · REINICIAR";
+                    playBtn.onclick = resetMatch;
+                }
+                const mins = Math.floor(matchSeconds / 60);
+                const secs = matchSeconds % 60;
+                document.getElementById('match-clock').innerText = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 100);
+        }
+
+        function resetMatch() {
+            if (clockInterval) clearInterval(clockInterval);
+            isClockRunning = false;
+            chamosScore = 0;
+            rivalScore = 0;
+            matchSeconds = 0;
+            document.getElementById('score-chamos').innerText = '0';
+            document.getElementById('score-rival').innerText = '0';
+            document.getElementById('match-clock').innerText = '00:00';
+            document.getElementById('ball').style.opacity = '0';
+            
+            // Ocultar cartas en cancha hasta que se inicie
+            for (let i = 0; i < 5; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                slot.style.opacity = '0';
+            }
+
+            // Mostrar botón INICIAR y ocultar PLAY
+            const playBtn = document.getElementById('play-btn');
+            playBtn.innerText = "▶ PLAY · GOL (25%)";
+            playBtn.onclick = startRandomGoalPlay;
+            playBtn.style.display = 'none';
+
+            document.getElementById('start-match-btn').style.display = 'inline-flex';
+            document.getElementById('start-match-btn').disabled = false;
+
+            playWhistle();
+        }
+
+        // 2. Presentación 1 a 1 de Cartas (Franco -> Henry -> Percu -> Aaron -> Raúl)
+        async function startLineupPresentation() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const startBtn = document.getElementById('start-match-btn');
+            startBtn.disabled = true;
+
+            // Ocultar cartas temporalmente
+            for (let i = 0; i < 5; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                slot.style.opacity = '0';
+                slot.style.transform = 'translate(-50%, -50%) scale(0.4)';
+            }
+
+            playWhistle();
+
+            for (let i = 0; i < starters.length; i++) {
+                const p = starters[i];
+                const banner = document.getElementById('goal-banner');
+                banner.classList.remove('active');
+
+                // Mostrar en centro con fanfarria
+                const slot = document.getElementById(`slot-${i}`);
+                slot.style.top = '48%';
+                slot.style.left = '50%';
+                slot.style.opacity = '1';
+                slot.style.transform = 'translate(-50%, -50%) scale(1.4)';
+                slot.style.zIndex = '999';
+
+                playKickFX();
+                await wait(1100);
+
+                // Volar a su posición táctica
+                slot.style.zIndex = '20';
+                slot.style.transform = 'translate(-50%, -50%) rotateX(-36deg) scale(1)';
+                slot.style.top = `${basePositions[i].top}%`;
+                slot.style.left = `${basePositions[i].left}%`;
+                playKickFX();
+
+                await wait(400);
+            }
+
+            playWhistle();
+            isAnimating = false;
+
+            // CUANDO YA TERMINEN LOS JUGADORES COLOCADOS: APARECE EL BOTÓN PLAY Y ARRANCA EL CRONÓMETRO RÁPIDO
+            startBtn.style.display = 'none';
+            const playBtn = document.getElementById('play-btn');
+            playBtn.style.display = 'inline-flex';
+            playBtn.disabled = false;
+
+            startFastClock();
+        }
+
+        // 3. Simulación de Gol Aleatorio (25% cada jugador de campo)
+        // Aaron y Percu/Josué se adelantan desde atrás hasta el área rival
+        async function startRandomGoalPlay() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const playBtn = document.getElementById('play-btn');
+            playBtn.disabled = true;
+
+            document.getElementById('goal-banner').classList.remove('active');
+            stopConfetti();
+            renderStarters();
+            playWhistle();
+
+            const ball = document.getElementById('ball');
+            ball.style.opacity = '1';
+
+            // 25% de probabilidad para cada jugador de campo (0: Franco, 1: Henry, 2: Percu, 3: Aaron)
+            const outfieldIndices = [0, 1, 2, 3];
+            const chosen = outfieldIndices[Math.floor(Math.random() * 4)];
+            const scorer = starters[chosen];
+
+            if (chosen === 3) {
+                // AARON (CIERRE / DEFENSA) - Sube desde su campo hasta el área rival
+                passBallTo(3, 72, 50); playKickFX(); await wait(650);
+                movePlayer(3, 46, 50); passBallTo(3, 46, 50); playKickFX(); await wait(700);
+                movePlayer(0, 18, 22); movePlayer(1, 18, 78); await wait(500);
+                movePlayer(3, 24, 48); passBallTo(3, 24, 48); playKickFX(); await wait(650);
+                finishGoal(`¡¡BOMBAZO DE ${scorer.name.toUpperCase()}!!`, `DESDOBLE DEFENSIVO LETAL: Recuperó en su área, cruzó la cancha y reventó la escuadra.`);
+            }
+            else if (chosen === 2) {
+                // PERCU / JOSUÉ (MEDIO CAMPO) - Conduce y entra al área
+                passBallTo(2, 48, 50); playKickFX(); await wait(650);
+                movePlayer(2, 34, 52); passBallTo(2, 34, 52); playKickFX(); await wait(650);
+                movePlayer(2, 20, 50); passBallTo(2, 20, 50); playKickFX(); await wait(700);
+                finishGoal(`¡¡GOLAZO MAGISTRAL DE ${scorer.name.toUpperCase()}!!`, `MAGIA EN EL MEDIO CAMPO: Pared rápida, quiebre en el punto penal y definición con comba.`);
+            }
+            else if (chosen === 0) {
+                // FRANCO (PÍVOT IZQUIERDO) - Volea letal
+                passBallTo(2, 48, 50); playKickFX(); await wait(600);
+                movePlayer(1, 20, 68); passBallTo(1, 20, 68); playKickFX(); await wait(650);
+                movePlayer(0, 16, 42); passBallTo(0, 16, 42); playKickFX(); await wait(650);
+                finishGoal(`¡¡VOLEA ROMPE-REDES DE ${scorer.name.toUpperCase()}!!`, `TRIANGULACIÓN OFENSIVA: Centro rasante y definición fulminante de primera.`);
+            }
+            else {
+                // HENRY (PÍVOT DERECHO) - Desborde y tiro cruzado
+                movePlayer(1, 26, 74); passBallTo(1, 26, 74); playKickFX(); await wait(650);
+                movePlayer(1, 18, 54); passBallTo(1, 18, 54); playKickFX(); await wait(700);
+                finishGoal(`¡¡ZAPATAZO CRUZADO DE ${scorer.name.toUpperCase()}!!`, `DESBORDE ELÉCTRICO: Encaró por banda derecha, recortó hacia el centro y clavó el misil.`);
+            }
+
+            playBtn.disabled = false;
+            isAnimating = false;
+        }
+
+        function passBallTo(slotIndex, top, left) {
+            const ball = document.getElementById('ball');
+            ball.style.top = `${top}%`;
+            ball.style.left = `${left}%`;
+        }
+
+        function moveBall(top, left) {
+            const ball = document.getElementById('ball');
+            ball.style.top = `${top}%`;
+            ball.style.left = `${left}%`;
+        }
+
+        function movePlayer(slotIndex, top, left) {
+            const slot = document.getElementById(`slot-${slotIndex}`);
+            slot.style.top = `${top}%`;
+            slot.style.left = `${left}%`;
+        }
+
+        function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function finishGoal(scorerTitle, motto) {
+            const ball = document.getElementById('ball');
+            ball.style.left = '50%';
+            ball.style.top = '1%';
+            playKickFX();
+
+            await wait(450);
+            playGoalFanfare();
+
+            // Incrementar Marcador Dinámico
+            chamosScore++;
+            document.getElementById('score-chamos').innerText = chamosScore;
+
+            document.getElementById('scorer-name').innerText = scorerTitle;
+            document.getElementById('team-motto').innerText = `"${motto}"`;
+            document.getElementById('goal-banner').classList.add('active');
+            triggerConfetti();
+
+            await wait(1400);
+
+            // Celebración grupal
+            for (let i = 0; i < 5; i++) {
+                movePlayer(i, 28, 30 + i * 10);
+            }
+            ball.style.opacity = '0';
+        }
+
+        // Efectos Confeti CSS
+        function triggerConfetti() {
+            const c = document.getElementById('confetti-container');
+            c.innerHTML = '';
+            c.classList.add('active');
+            const colors = ['#f59e0b', '#dc2626', '#ffffff', '#000000', '#fef08a'];
+
+            for (let i = 0; i < 45; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti-piece';
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.animationDuration = `${1.2 + Math.random() * 1.6}s`;
+                p.style.animationDelay = `${Math.random() * 0.3}s`;
+                c.appendChild(p);
+            }
+
+            setTimeout(stopConfetti, 3500);
+        }
+
+        function stopConfetti() {
+            const c = document.getElementById('confetti-container');
+            c.classList.remove('active');
+            c.innerHTML = '';
+        }
+
+        // Modal Stats
+        function openStats(index) { showModal(starters[index]); }
+        function openBenchStats(index) { showModal(bench[index]); }
+
+        function showModal(p) {
+            document.getElementById('modal-name').innerText = p.name;
+            document.getElementById('modal-role').innerText = p.role;
+            document.getElementById('st-rit').innerText = p.rit;
+            document.getElementById('st-dri').innerText = p.dri;
+            document.getElementById('st-sho').innerText = p.sho;
+            document.getElementById('st-def').innerText = p.def;
+            document.getElementById('st-pas').innerText = p.pas;
+            document.getElementById('st-phy').innerText = p.phy;
+            document.getElementById('modal-desc').innerText = p.desc;
+            document.getElementById('stats-modal').classList.add('active');
+        }
+
+        function closeStats() { document.getElementById('stats-modal').classList.remove('active'); }
+
+        // Reloj de partido continuo
+        setInterval(() => {
+            matchSeconds++;
+            const m = Math.floor(matchSeconds / 60).toString().padStart(2, '0');
+            const s = (matchSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('match-clock').innerText = `${m}:${s}`;
+        }, 1000);
+
+        window.onload = () => {
+            renderStarters();
+            renderBench();
+        };
+    </script>
+</body>
+</html>
